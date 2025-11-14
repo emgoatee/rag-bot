@@ -19,6 +19,11 @@ class FileSearchManager:
 
     def __init__(self, settings: Optional[Settings] = None) -> None:
         self.settings = settings or get_settings()
+        if not self.settings.api_key:
+            raise ValueError(
+                "GOOGLE_AI_API_KEY environment variable is required. "
+                "Get your API key from https://aistudio.google.com/apikey"
+            )
         self.client = genai.Client(api_key=self.settings.api_key)
         self._stores_api = getattr(self.client, "file_search_stores", None)
         self._file_search_api = getattr(self.client, "file_search", None)

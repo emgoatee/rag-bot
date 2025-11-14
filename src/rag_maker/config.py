@@ -33,8 +33,7 @@ class Settings(BaseSettings):
     @classmethod
     def from_env(cls) -> "Settings":
         load_dotenv()
-        if not (os.getenv("GOOGLE_AI_API_KEY") or cls().api_key):
-            raise RuntimeError("GOOGLE_AI_API_KEY is not set.")
+        # Don't raise on import - let the app start and fail later if key is actually needed
         return cls()
 
 
