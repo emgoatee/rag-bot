@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG Maker – Guided Setup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div>
+          <h1>RAG Maker</h1>
+          <p>
+            Guided workflow to ground Gemini responses on your documents. Follow the steps to ingest files,
+            confirm indexing, and start chatting with your private knowledge base.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button id="back-to-models" class="btn ghost hidden">← All Models</button>
+          <div class="status-badge" id="store-meta">Pick or create a model to get started.</div>
+        </div>
+      </header>
+
+      <section id="model-hub" class="panel model-hub">
+        <div class="panel-header">
+          <div>
+            <h2>Your RAG Models</h2>
+            <p class="panel-subtitle">
+              Create multiple knowledge bases and reopen any workspace to continue uploading or chatting.
+            </p>
+          </div>
+          <button id="create-store-btn" class="btn primary">+ New Model</button>
+        </div>
+        <div id="model-list" class="model-list">
+          <div class="model-card skeleton">
+            <div class="model-name">Loading models…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Create Model Modal -->
+      <div id="create-store-modal" class="modal hidden">
+        <div class="modal-content">
+          <h3>Create New RAG Model</h3>
+          <form id="create-store-form">
+            <label class="field">
+              <span>Model Name</span>
+              <input type="text" id="store-name-input" placeholder="My Documents Model" required />
+            </label>
+            <div class="modal-actions">
+              <button type="button" id="cancel-store-btn" class="btn ghost">Cancel</button>
+              <button type="submit" class="btn primary">Create Model</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section id="workflow" class="workflow hidden">
+        <nav class="stepper" aria-label="RAG setup progress">
+          <div class="step active" data-step="1">
+            <span class="step-index">1</span>
+            <div class="step-info">
+              <h2>Connect Content</h2>
+              <p>Upload files or link remote sources.</p>
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <span class="step-index">2</span>
+            <div class="step-info">
+              <h2>Review Index</h2>
+              <p>Verify documents were processed.</p>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <span class="step-index">3</span>
+            <div class="step-info">
+              <h2>Chat & Cite</h2>
+              <p>Ask grounded questions with citations.</p>
+            </div>
+          </div>
+        </nav>
+
+        <section class="panels">
+          <section class="panel" id="panel-upload">
+            <h3>Step 1 · Upload local documents</h3>
+            <p class="panel-subtitle">
+              PDFs, Office docs, Markdown, code, and plain text are supported. Files stay in your Google File
+              Search store.
+            </p>
+            <form id="file-upload-form">
+              <label class="dropzone" for="file-input">
+                <input id="file-input" type="file" name="files" multiple />
+                <span class="dropzone-icon">⬆</span>
+                <span class="dropzone-text">
+                  Drag & drop or <span class="accent">browse</span> for files
+                </span>
+                <span class="dropzone-hint">Up to 100 MB per file</span>
+              </label>
+              <ul id="selected-files" class="selected-files hidden" aria-live="polite"></ul>
+              <button type="submit" class="btn primary" disabled>Upload Selected Files</button>
+            </form>
+            <div id="upload-status" class="status-note" role="status"></div>
+            <div id="upload-progress" class="status-list" role="status" aria-live="polite"></div>
+            <div class="divider">
+              <span>or</span>
+            </div>
+            <form id="url-upload-form" class="inline-form">
+              <label class="field">
+                <span>Remote file URL</span>
+                <input type="url" id="url-input" placeholder="https://example.com/policy.pdf" required />
+              </label>
+              <label class="field">
+                <span>Display name (optional)</span>
+                <input type="text" id="url-display" placeholder="Policy - 2025 update.pdf" />
+              </label>
+              <button type="submit" class="btn">Import From URL</button>
+            </form>
+          </section>
+
+          <section class="panel" id="panel-files">
+            <div class="panel-header">
+              <h3>Step 2 · File search inventory</h3>
+              <button id="refresh-files" class="btn ghost">Refresh</button>
+            </div>
+            <p class="panel-subtitle">
+              Processed documents appear once Google finishes chunking and embedding them. If the list is empty,
+              your files may still be indexing—Google’s latest SDK sometimes omits listings, so rely on the chat
+              step below to validate answers and citations.
+            </p>
+            <div class="file-table-wrap">
+              <table class="file-table">
+                <thead>
+                  <tr>
+                    <th>Display Name</th>
+                    <th>Status</th>
+                    <th>Chunks</th>
+                    <th>Size</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
+                <tbody id="file-table-body">
+                  <tr>
+                    <td colspan="5" class="empty">No documents yet. Upload to get started.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel chat-panel" id="panel-chat">
+            <h3>Step 3 · Chat with your knowledge base</h3>
+            <p class="panel-subtitle">
+              Ask concise questions. Responses include citations referencing the retrieved snippets.
+            </p>
+            <div class="chat-window" id="chat-thread" aria-live="polite"></div>
+            <form id="chat-form" class="chat-form">
+              <textarea
+                id="chat-input"
+                rows="3"
+                placeholder="Example: Summarize the onboarding policy obligations."
+                required
+              ></textarea>
+              <div class="chat-actions">
+                <label class="field compact">
+                  <span>Max chunks</span>
+                  <input type="number" id="chat-max-chunks" min="1" max="32" value="16" />
+                </label>
+                <label class="field compact">
+                  <span>Temperature</span>
+                  <input type="number" id="chat-temperature" step="0.1" min="0" max="1" value="0.3" />
+                </label>
+                <button type="submit" class="btn primary">Ask Gemini</button>
+              </div>
+            </form>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="assertive"></div>
+
+    <template id="message-template">
+      <article class="message">
+        <header>
+          <span class="role"></span>
+          <time></time>
+        </header>
+        <p class="content"></p>
+        <ul class="citations"></ul>
+      </article>
+    </template>
+
+    <script type="module" src="/assets/app.js"></script>
+  </body>
+</html>
+
+

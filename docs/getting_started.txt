@@ -1,0 +1,12 @@
+RAG Maker Onboarding Guide
+==========================
+
+Deployment:
+- Use uvicorn rag_maker.service:app --reload for local testing.
+- Protect the FastAPI endpoints with an API gateway before production.
+
+Compliance Policy:
+- All uploads must be under 100 MB.
+- Retain audit logs for 2 years.
+- Review citations for accuracy before sharing responses externally.
+

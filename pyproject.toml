@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "rag-maker"
+version = "0.1.0"
+description = "Reference RAG stack built on Google AI File Search (Gemini API)"
+authors = ["Todd Ponsky <toddponskymd@gmail.com>"]
+readme = "README.md"
+packages = [
+  { include = "rag_maker", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+google-genai = "^0.3.0"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.32.0" }
+python-dotenv = "^1.0.1"
+pydantic = "^2.7.0"
+python-multipart = "^0.0.9"
+pydantic-settings = "^2.5.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^0.23.0"
+
+[build-system]
+requires = [
+  "poetry-core>=1.8.0"
+]
+build-backend = "poetry.core.masonry.api"
+
